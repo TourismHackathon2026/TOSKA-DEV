@@ -1,0 +1,21 @@
+import { Routes, Route } from 'react-router-dom';
+import Layout from './components/Layout';
+import Home from './pages/Home';
+import ExploreTreks from './pages/ExploreTreks';
+import DashboardPage from './pages/DashboardPage';
+import WeatherPage from './pages/WeatherPage';
+import SafetyPage from './pages/SafetyPage';
+
+export default function App() {
+  return (
+    <Layout>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/explore" element={<ExploreTreks />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/weather" element={<WeatherPage />} />
+        <Route path="/safety" element={<SafetyPage />} />
+      </Routes>
+    </Layout>
+  );
+}
