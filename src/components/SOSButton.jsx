@@ -70,8 +70,8 @@ export default function SOSButton() {
         onClick={() => setIsOpen(true)}
         className="sos-pulse inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-white font-bold text-lg tracking-wide cursor-pointer select-none transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400/50"
         style={{
-          background: '#FF453A',
-          boxShadow: '0 0 24px rgba(255, 69, 58, 0.45)',
+          background: '#D32F2F',
+          boxShadow: '0 0 24px rgba(211, 47, 47, 0.35)',
         }}
         aria-label="Activate SOS Emergency"
       >
@@ -83,7 +83,7 @@ export default function SOSButton() {
       {isOpen && (
         <div
           className="fixed inset-0 z-[9999] flex items-center justify-center px-4 animate-fadeIn"
-          style={{ background: 'rgba(0, 0, 0, 0.85)' }}
+          style={{ background: 'rgba(0, 0, 0, 0.5)', backdropFilter: 'blur(4px)' }}
           onClick={() => {
             if (!loading) setIsOpen(false);
           }}
@@ -91,9 +91,9 @@ export default function SOSButton() {
           <div
             className="relative w-full max-w-md rounded-2xl p-8 text-center animate-fadeInUp"
             style={{
-              background: '#1A1A1A',
-              border: '1px solid #2A2A2A',
-              boxShadow: '0 0 60px rgba(255, 69, 58, 0.2), 0 24px 48px rgba(0,0,0,0.5)',
+              background: '#FFFFFF',
+              border: '1px solid #E2E8F0',
+              boxShadow: '0 0 40px rgba(211, 47, 47, 0.1), 0 24px 48px rgba(0,0,0,0.15)',
             }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -101,10 +101,7 @@ export default function SOSButton() {
             <button
               onClick={() => setIsOpen(false)}
               disabled={loading}
-              className="absolute top-4 right-4 transition-colors cursor-pointer disabled:opacity-50"
-              style={{ color: '#636366' }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#FFF'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = '#636366'; }}
+              className="absolute top-4 right-4 transition-colors cursor-pointer disabled:opacity-50 text-slate-400 hover:text-slate-700"
               aria-label="Close modal"
             >
               <X size={20} />
@@ -114,23 +111,23 @@ export default function SOSButton() {
             <div
               className="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center"
               style={{
-                background: '#1A1A1A',
-                border: '1px solid rgba(255,69,58,0.3)',
+                background: '#FEF2F2',
+                border: '2px solid rgba(211,47,47,0.2)',
               }}
             >
-              <AlertTriangle size={36} style={{ color: '#FF453A' }} strokeWidth={2} />
+              <AlertTriangle size={36} style={{ color: '#D32F2F' }} strokeWidth={2} />
             </div>
 
             {/* Title */}
             <h3
-              className="text-2xl font-extrabold text-white mb-3"
+              className="text-2xl font-extrabold text-slate-800 mb-3"
               style={{ fontFamily: 'var(--font-heading)' }}
             >
               Emergency SOS
             </h3>
 
             {/* Message */}
-            <p style={{ color: '#8E8E9A', fontSize: '14px', lineHeight: '1.6', maxWidth: '320px', margin: '0 auto 2rem' }}>
+            <p className="text-sm text-slate-500 leading-relaxed max-w-[320px] mx-auto mb-8">
               This will broadcast your GPS coordinates to local rescue teams and
               Nepal Mountain Rescue. Only activate in a genuine emergency.
             </p>
@@ -143,8 +140,8 @@ export default function SOSButton() {
                 disabled={loading}
                 className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-white font-bold text-sm tracking-wide cursor-pointer transition-all duration-300 hover:scale-[1.02] active:scale-95 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
-                  background: '#FF453A',
-                  boxShadow: '0 0 20px rgba(255,69,58,0.35)',
+                  background: '#D32F2F',
+                  boxShadow: '0 4px 14px rgba(211,47,47,0.3)',
                 }}
               >
                 {loading ? (
@@ -159,12 +156,7 @@ export default function SOSButton() {
                 id="sos-cancel-button"
                 onClick={() => setIsOpen(false)}
                 disabled={loading}
-                className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-sm tracking-wide cursor-pointer transition-all duration-300 hover:text-white active:scale-95 focus:outline-none disabled:opacity-50"
-                style={{
-                  background: '#111',
-                  border: '1px solid #2A2A2A',
-                  color: '#8E8E9A',
-                }}
+                className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-sm tracking-wide cursor-pointer transition-all duration-300 active:scale-95 focus:outline-none disabled:opacity-50 text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 border border-slate-200"
               >
                 Cancel
               </button>

@@ -5,11 +5,11 @@ import { useAuth } from '../context/AuthContext';
 import { createBookingInFirestore } from '../utils/firebaseService';
 
 const DIFFICULTY_COLORS = {
-  'Easy':           { bg: 'bg-emerald-500/90', text: 'text-white' },
-  'Easy–Moderate':  { bg: 'bg-teal-500/90',    text: 'text-white' },
-  'Moderate':       { bg: 'bg-sky-500/90',      text: 'text-white' },
-  'Challenging':    { bg: 'bg-orange-500/90',   text: 'text-white' },
-  'Strenuous':      { bg: 'bg-red-500/90',      text: 'text-white' },
+  Easy: { bg: 'bg-emerald-500/90', text: 'text-white' },
+  'Easy–Moderate': { bg: 'bg-teal-500/90', text: 'text-white' },
+  Moderate: { bg: 'bg-sky-500/90', text: 'text-white' },
+  Challenging: { bg: 'bg-orange-500/90', text: 'text-white' },
+  Strenuous: { bg: 'bg-red-500/90', text: 'text-white' },
 };
 
 function StarRating({ rating, reviews }) {
@@ -19,9 +19,7 @@ function StarRating({ rating, reviews }) {
 
   for (let i = 0; i < 5; i++) {
     if (i < full) {
-      stars.push(
-        <Star key={i} size={14} className="fill-amber-400 text-amber-400" />
-      );
+      stars.push(<Star key={i} size={14} className="fill-amber-400 text-amber-400" />);
     } else if (i === full && hasHalf) {
       stars.push(
         <span key={i} className="relative inline-block" style={{ width: 14, height: 14 }}>
@@ -32,9 +30,7 @@ function StarRating({ rating, reviews }) {
         </span>
       );
     } else {
-      stars.push(
-        <Star key={i} size={14} className="text-surface-600" />
-      );
+      stars.push(<Star key={i} size={14} className="text-surface-600" />);
     }
   }
 
@@ -61,7 +57,7 @@ export default function TrekCard({ trek }) {
     notes: '',
   });
 
-  const diff = DIFFICULTY_COLORS[trek.difficulty] || DIFFICULTY_COLORS['Moderate'];
+  const diff = DIFFICULTY_COLORS[trek.difficulty] || DIFFICULTY_COLORS.Moderate;
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -69,6 +65,7 @@ export default function TrekCard({ trek }) {
 
   const handleBookTrek = async (e) => {
     e.preventDefault();
+
     if (!user) {
       navigate('/login');
       return;
@@ -99,356 +96,255 @@ export default function TrekCard({ trek }) {
 
   return (
     <>
-      <article
-        id={`trek-card-${trek.id}`}
-        className="group flex flex-col overflow-hidden transition-all duration-400"
-        style={{
-          background: '#1A1A1A',
-          border: '1px solid #2A2A2A',
-          borderRadius: '16px',
-        }}
-        onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#444'; }}
-        onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#2A2A2A'; }}
-      >
-        {/* ── Image ── */}
-        <div className="relative h-52 sm:h-56 overflow-hidden">
+      <article className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-lg transition duration-300 card-lift glass-card">
+        <div className="relative h-64 overflow-hidden rounded-t-2xl">
           <img
             src={trek.image}
             alt={trek.name}
             loading="lazy"
-            className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+            className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
           />
-          {/* Dark overlay on image */}
-          <div
-            className="absolute inset-0"
-            style={{ background: 'linear-gradient(to top, #000 0%, transparent 60%)' }}
-          />
-
-          {/* Difficulty Badge */}
-          <span
-            className={`absolute top-3 left-3 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider
-                        backdrop-blur-md ${diff.bg} ${diff.text}`}
-          >
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+          <span className={`absolute top-5 left-5 rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wider backdrop-blur-sm ${diff.bg} ${diff.text}`}>
             {trek.difficulty}
           </span>
-
-          {/* Active Trekkers Badge */}
           {trek.activeTrekkers > 0 && (
-            <div
-              className="absolute top-3 right-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs"
-              style={{ background: 'rgba(0,0,0,0.6)', border: '1px solid #2A2A2A', color: '#ccc' }}
-            >
-              <span className="live-dot" style={{ width: 6, height: 6 }} />
-              <Users size={12} style={{ color: '#30D158' }} />
-              <span className="font-semibold" style={{ color: '#30D158' }}>{trek.activeTrekkers}</span>
+            <div className="absolute top-5 right-5 flex items-center gap-2.5 rounded-full border border-slate-200 bg-white/95 px-4 py-2 text-xs font-semibold text-slate-700 shadow-md backdrop-blur-sm">
+              <span className="h-2.5 w-2.5 rounded-full bg-primary" />
+              <Users className="h-4 w-4 text-primary" />
+              <span className="text-primary">{trek.activeTrekkers}</span>
               <span className="hidden sm:inline">active</span>
             </div>
           )}
         </div>
 
-        {/* ── Body ── */}
-        <div className="flex flex-col flex-1 p-5">
-          {/* Name */}
-          <h3
-            className="text-lg font-bold text-white mb-1 transition-colors duration-300 line-clamp-1"
-            style={{ fontFamily: "var(--font-heading)" }}
-          >
-            {trek.name}
-          </h3>
-
-          {/* Region */}
-          <div className="flex items-center gap-1 text-sm mb-4" style={{ color: '#8E8E9A' }}>
-            <MapPin size={13} style={{ color: '#5BB4FF' }} className="flex-shrink-0" />
-            {trek.region}
+        <div className="flex flex-col gap-6 p-6">
+          <div>
+            <h3 className="text-lg font-bold text-slate-900 line-clamp-2" style={{ fontFamily: 'var(--font-heading)' }}>
+              {trek.name}
+            </h3>
+            <div className="mt-3 flex items-center gap-2.5 text-sm text-slate-500">
+              <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+              <span>{trek.region}</span>
+            </div>
           </div>
 
-          {/* Stats Row */}
-          <div className="grid grid-cols-3 gap-2 mb-4">
+          <div className="grid gap-4 sm:grid-cols-3">
             {[
-              { icon: Clock,      label: 'Duration', value: trek.duration },
+              { icon: Clock, label: 'Duration', value: trek.duration },
               { icon: TrendingUp, label: 'Altitude', value: trek.maxAltitude },
-              { icon: Route,      label: 'Distance', value: trek.distance },
+              { icon: Route, label: 'Distance', value: trek.distance },
             ].map(({ icon: Icon, label, value }) => (
-              <div
-                key={label}
-                className="flex flex-col items-center text-center px-1 py-2.5 rounded-xl"
-                style={{ background: '#111', border: '1px solid #1A1A1A' }}
-              >
-                <Icon size={15} style={{ color: '#5BB4FF' }} className="mb-1" />
-                <span className="text-[11px] uppercase tracking-wider" style={{ color: '#636366' }}>{label}</span>
-                <span className="text-xs font-semibold text-slate-200 mt-0.5">{value}</span>
+              <div key={label} className="rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 p-5 text-center hover:from-slate-100 hover:to-slate-150 transition-all duration-300">
+                <Icon className="mx-auto mb-2.5 h-5 w-5 text-primary" />
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500">{label}</p>
+                <p className="mt-2 text-sm font-bold text-slate-800">{value}</p>
               </div>
             ))}
           </div>
 
-          {/* Rating */}
-          <div className="mb-5">
-            <StarRating rating={trek.rating} reviews={trek.reviews} />
-          </div>
+          <div className="h-px bg-gradient-to-r from-slate-200 via-slate-200 to-slate-200" />
 
-          {/* Price + CTA */}
-          <div className="mt-auto flex items-center justify-between">
+          <div className="flex items-center justify-between gap-4">
             <div>
-              <span className="text-[11px] uppercase tracking-wider block" style={{ color: '#636366' }}>From</span>
-              <span className="text-xl font-bold text-white">${trek.price.toLocaleString()}</span>
+              <p className="text-xs font-semibold uppercase tracking-[0.15em] text-slate-400">From</p>
+              <p className="mt-1 text-2xl font-bold text-slate-900">${trek.price.toLocaleString()}</p>
             </div>
             <button
-              id={`trek-view-${trek.id}`}
+              type="button"
               onClick={() => setIsOpen(true)}
-              className="px-5 py-2 rounded-xl text-sm font-semibold cursor-pointer transition-all duration-300"
-              style={{
-                background: 'transparent',
-                color: '#5BB4FF',
-                border: '1px solid #5BB4FF',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#5BB4FF';
-                e.currentTarget.style.color = '#000';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'transparent';
-                e.currentTarget.style.color = '#5BB4FF';
-              }}
+              className="rounded-xl border-2 border-primary px-6 py-3 text-sm font-bold text-primary transition duration-300 hover:bg-primary hover:text-white btn-press"
             >
-              View Details
+              Book Now
             </button>
           </div>
         </div>
       </article>
 
-      {/* ── Trek Details & Booking Modal ── */}
       {isOpen && (
-        <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center px-4 py-6 overflow-y-auto animate-fadeIn"
-          style={{ background: 'rgba(0, 0, 0, 0.85)' }}
-          onClick={() => {
-            setIsOpen(false);
-            setBookingSuccess(false);
-            setBookingError('');
-          }}
-        >
-          <div
-            className="relative w-full max-w-4xl rounded-3xl overflow-hidden animate-fadeInUp flex flex-col md:flex-row"
-            style={{
-              background: '#1A1A1A',
-              border: '1px solid #2A2A2A',
-              boxShadow: '0 24px 48px rgba(0,0,0,0.5)',
-              maxHeight: '90vh',
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Close Button */}
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-4">
+          <div className="relative w-full max-w-4xl overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-slate-200">
             <button
-              onClick={() => {
-                setIsOpen(false);
-                setBookingSuccess(false);
-                setBookingError('');
-              }}
-              className="absolute top-4 right-4 z-20 text-slate-400 hover:text-white transition-colors p-2 rounded-full cursor-pointer"
-              style={{ background: 'rgba(0,0,0,0.6)' }}
-              aria-label="Close modal"
+              type="button"
+              onClick={() => setIsOpen(false)}
+              className="absolute right-6 top-6 rounded-full border-2 border-slate-200 bg-white p-2.5 text-slate-600 transition hover:bg-slate-100 hover:border-slate-300 z-10"
+              aria-label="Close details"
             >
-              <X size={20} />
+              <X className="h-5 w-5" />
             </button>
 
-            {/* Left Column: Trek Media & Info */}
-            <div className="md:w-1/2 flex flex-col overflow-y-auto max-h-[45vh] md:max-h-none" style={{ borderRight: '1px solid #2A2A2A' }}>
-              <div className="relative h-60 md:h-72 overflow-hidden flex-shrink-0">
-                <img
-                  src={trek.image}
-                  alt={trek.name}
-                  className="w-full h-full object-cover"
-                />
-                <div
-                  className="absolute inset-0"
-                  style={{ background: 'linear-gradient(to top, #1A1A1A 0%, rgba(26,26,26,0.3) 40%, transparent 100%)' }}
-                />
-                <div className="absolute bottom-5 left-6 right-6">
-                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${diff.bg} ${diff.text}`}>
-                    {trek.difficulty}
-                  </span>
-                  <h3 className="text-2xl md:text-3xl font-extrabold text-white mt-2" style={{ fontFamily: 'var(--font-heading)' }}>
-                    {trek.name}
-                  </h3>
-                  <div className="flex items-center gap-1 text-sm mt-1" style={{ color: '#8E8E9A' }}>
-                    <MapPin size={12} style={{ color: '#5BB4FF' }} />
-                    {trek.region}
+            <div className="grid gap-8 md:grid-cols-[1.1fr_0.9fr]">
+              <div className="space-y-8 border-b border-slate-200 p-7 md:border-r md:border-b-0 md:p-10">
+                <div className="relative overflow-hidden rounded-2xl bg-slate-100">
+                  <img src={trek.image} alt={trek.name} className="h-64 w-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  <div className="absolute bottom-8 left-8 right-8 text-white">
+                    <span className={`inline-flex rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-[0.2em] ${diff.bg} ${diff.text}`}>
+                      {trek.difficulty}
+                    </span>
+                    <h3 className="mt-4 text-2xl font-extrabold leading-tight">{trek.name}</h3>
+                    <div className="mt-3 flex items-center gap-2.5 text-sm text-slate-200">
+                      <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                      <span>{trek.region}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="p-6 md:p-8 flex-1">
-                <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-2">About this Trek</h4>
-                <p className="text-sm leading-relaxed mb-6" style={{ color: '#8E8E9A' }}>
-                  {trek.description}
-                </p>
-
-                <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-3">Highlights</h4>
-                <ul className="space-y-2 mb-6">
-                  {trek.highlights && trek.highlights.map((h, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm" style={{ color: '#ccc' }}>
-                      <span style={{ color: '#5BB4FF' }} className="mt-0.5">✦</span>
-                      <span>{h}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="grid grid-cols-3 gap-3 p-4 rounded-2xl" style={{ background: '#111', border: '1px solid #2A2A2A' }}>
-                  <div className="text-center">
-                    <span className="block text-[10px] uppercase tracking-wider" style={{ color: '#636366' }}>Duration</span>
-                    <span className="text-xs font-semibold text-slate-200">{trek.duration}</span>
+                <div className="space-y-6">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">About this trek</p>
+                    <p className="mt-4 text-base leading-8 text-slate-700">{trek.description}</p>
                   </div>
-                  <div className="text-center" style={{ borderLeft: '1px solid #2A2A2A', borderRight: '1px solid #2A2A2A' }}>
-                    <span className="block text-[10px] uppercase tracking-wider" style={{ color: '#636366' }}>Altitude</span>
-                    <span className="text-xs font-semibold text-slate-200">{trek.maxAltitude}</span>
-                  </div>
-                  <div className="text-center">
-                    <span className="block text-[10px] uppercase tracking-wider" style={{ color: '#636366' }}>Distance</span>
-                    <span className="text-xs font-semibold text-slate-200">{trek.distance}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
 
-            {/* Right Column: Booking System */}
-            <div className="md:w-1/2 p-6 md:p-8 flex flex-col justify-center overflow-y-auto max-h-[45vh] md:max-h-none">
-              <h3 className="text-xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-heading)' }}>
-                Book Your Adventure
-              </h3>
-              <p className="text-xs mb-6" style={{ color: '#636366' }}>
-                Secure your permit, local guide, and telemetry safety kit for the trek.
-              </p>
-
-              {bookingSuccess ? (
-                <div
-                  className="text-center py-8 px-4 rounded-2xl text-slate-200 animate-fadeIn"
-                  style={{ background: 'rgba(48,209,88,0.08)', border: '1px solid rgba(48,209,88,0.2)' }}
-                >
-                  <span className="text-4xl block mb-3">🏔️</span>
-                  <h4 className="text-lg font-bold mb-1" style={{ color: '#30D158' }}>Trek Booking Requested!</h4>
-                  <p className="text-xs mb-6" style={{ color: '#8E8E9A' }}>
-                    Our safety guides will review your booking itinerary and approve it.
-                  </p>
-                  <button
-                    onClick={() => {
-                      setIsOpen(false);
-                      setBookingSuccess(false);
-                    }}
-                    className="px-6 py-2.5 rounded-xl font-semibold text-sm transition-colors cursor-pointer"
-                    style={{ background: '#5BB4FF', color: '#000' }}
-                  >
-                    Done
-                  </button>
-                </div>
-              ) : (
-                <form onSubmit={handleBookTrek} className="flex flex-col gap-4">
-                  {/* Status Banner */}
-                  {bookingError && (
-                    <div
-                      className="flex items-center gap-2 rounded-xl px-4 py-3 text-xs animate-fadeIn"
-                      style={{ background: '#1A1A1A', borderLeft: '3px solid #FF453A', color: '#FF453A' }}
-                    >
-                      <AlertTriangle className="h-4 w-4 shrink-0" />
-                      {bookingError}
+                  {trek.highlights?.length > 0 && (
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Highlights</p>
+                      <ul className="mt-4 space-y-3 text-sm text-slate-700">
+                        {trek.highlights.map((item, index) => (
+                          <li key={index} className="flex items-start gap-3">
+                            <span className="mt-1 text-primary font-bold text-lg">•</span>
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   )}
 
-                  {!user ? (
-                    <div className="text-center py-6 rounded-2xl" style={{ border: '1px solid #2A2A2A', background: '#111' }}>
-                      <p className="text-sm mb-4" style={{ color: '#8E8E9A' }}>Please log in to manage and confirm bookings.</p>
-                      <button
-                        type="button"
-                        onClick={() => navigate('/login')}
-                        className="px-6 py-2.5 rounded-xl font-semibold text-sm transition-all cursor-pointer"
-                        style={{ background: '#5BB4FF', color: '#000' }}
-                      >
-                        Sign In / Register
-                      </button>
+                  <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-slate-100 p-6 text-sm">
+                    <div className="grid grid-cols-3 gap-4 text-center">
+                      <div>
+                        <div className="text-lg font-bold text-slate-900">{trek.duration}</div>
+                        <div className="mt-2 text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">Duration</div>
+                      </div>
+                      <div className="border-x border-slate-200">
+                        <div className="text-lg font-bold text-slate-900">{trek.maxAltitude}</div>
+                        <div className="mt-2 text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">Altitude</div>
+                      </div>
+                      <div>
+                        <div className="text-lg font-bold text-slate-900">{trek.distance}</div>
+                        <div className="mt-2 text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">Distance</div>
+                      </div>
                     </div>
-                  ) : (
-                    <>
-                      {/* Date */}
-                      <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-medium" style={{ color: '#8E8E9A' }}>Select Start Date</label>
-                        <div className="relative">
-                          <Calendar size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2" style={{ color: '#636366' }} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-7 md:p-10 flex flex-col">
+                <div className="mb-8">
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Book your adventure</p>
+                  <h4 className="mt-4 text-xl font-bold text-slate-900">Reserve your safety-certified trek</h4>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">Secure your permit, local guide, and telemetry kit for a safer journey.</p>
+                </div>
+
+                {bookingSuccess ? (
+                  <div className="rounded-2xl border-2 border-emerald-200 bg-emerald-50/80 p-8 text-center flex-1 flex flex-col items-center justify-center">
+                    <p className="text-5xl mb-4">✅</p>
+                    <p className="text-lg font-bold text-emerald-900">Booking requested!</p>
+                    <p className="mt-3 text-sm leading-6 text-slate-700">Our safety team will review your reservation and follow up soon.</p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsOpen(false);
+                        setBookingSuccess(false);
+                      }}
+                      className="mt-8 rounded-xl bg-primary px-8 py-3 text-sm font-bold text-white transition hover:opacity-90 btn-press"
+                    >
+                      Done
+                    </button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleBookTrek} className="space-y-6 flex flex-col">
+                    {bookingError && (
+                      <div className="rounded-2xl border-l-4 border-red-500 bg-red-50 p-5 text-sm font-medium text-red-700">
+                        <AlertTriangle className="inline mr-2 h-4 w-4" />
+                        {bookingError}
+                      </div>
+                    )}
+
+                    {!user ? (
+                      <div className="rounded-2xl border-2 border-slate-200 bg-slate-50/80 p-8 text-center flex-1 flex flex-col items-center justify-center">
+                        <p className="text-base leading-7 text-slate-700 mb-6">Please sign in to confirm and manage bookings.</p>
+                        <button
+                          type="button"
+                          onClick={() => navigate('/login')}
+                          className="rounded-xl bg-primary px-8 py-3 text-sm font-bold text-white transition hover:opacity-90 btn-press"
+                        >
+                          Sign In / Register
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="space-y-4">
+                          <label className="block text-xs font-bold uppercase tracking-[0.15em] text-slate-600">Start date</label>
+                          <div className="relative">
+                            <Calendar className="pointer-events-none absolute left-4 top-4 h-5 w-5 text-slate-400" />
+                            <input
+                              type="date"
+                              name="startDate"
+                              required
+                              value={formData.startDate}
+                              onChange={handleInputChange}
+                              className="w-full rounded-xl border-2 border-slate-200 bg-white py-3.5 pl-12 pr-4 text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-1 focus:ring-primary/10"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-4">
+                          <label className="block text-xs font-bold uppercase tracking-[0.15em] text-slate-600">Group size</label>
                           <input
-                            type="date"
-                            name="startDate"
+                            type="number"
+                            name="groupSize"
+                            min="1"
+                            max="20"
                             required
-                            value={formData.startDate}
+                            value={formData.groupSize}
                             onChange={handleInputChange}
-                            className="w-full rounded-xl py-3 pl-11 pr-4 text-xs text-white placeholder-slate-500 outline-none transition-all"
-                            style={{ background: '#111', border: '1px solid #2A2A2A' }}
-                            onFocus={(e) => { e.target.style.borderColor = '#5BB4FF'; }}
-                            onBlur={(e) => { e.target.style.borderColor = '#2A2A2A'; }}
+                            className="w-full rounded-xl border-2 border-slate-200 bg-white py-3.5 px-4 text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-1 focus:ring-primary/10"
                           />
                         </div>
-                      </div>
 
-                      {/* Group Size */}
-                      <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-medium" style={{ color: '#8E8E9A' }}>Number of Trekkers</label>
-                        <input
-                          type="number"
-                          name="groupSize"
-                          min="1"
-                          max="20"
-                          required
-                          value={formData.groupSize}
-                          onChange={handleInputChange}
-                          className="w-full rounded-xl py-3 px-4 text-xs text-white placeholder-slate-500 outline-none transition-all"
-                          style={{ background: '#111', border: '1px solid #2A2A2A' }}
-                          onFocus={(e) => { e.target.style.borderColor = '#5BB4FF'; }}
-                          onBlur={(e) => { e.target.style.borderColor = '#2A2A2A'; }}
-                        />
-                      </div>
-
-                      {/* Notes */}
-                      <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-medium" style={{ color: '#8E8E9A' }}>Special Notes / Medical Info</label>
-                        <textarea
-                          name="notes"
-                          rows="3"
-                          placeholder="e.g. Dietary requirements, medical concerns, or request a specific guide..."
-                          value={formData.notes}
-                          onChange={handleInputChange}
-                          className="w-full rounded-xl py-3 px-4 text-xs text-white placeholder-slate-500 outline-none resize-none transition-all"
-                          style={{ background: '#111', border: '1px solid #2A2A2A' }}
-                          onFocus={(e) => { e.target.style.borderColor = '#5BB4FF'; }}
-                          onBlur={(e) => { e.target.style.borderColor = '#2A2A2A'; }}
-                        />
-                      </div>
-
-                      {/* Live Price Estimation */}
-                      <div className="mt-2 flex items-center justify-between p-4 rounded-2xl" style={{ background: '#111', border: '1px solid #2A2A2A' }}>
-                        <div>
-                          <span className="text-[10px] uppercase tracking-wider block" style={{ color: '#636366' }}>Price per Person</span>
-                          <span className="text-sm font-semibold" style={{ color: '#8E8E9A' }}>${trek.price.toLocaleString()}</span>
+                        <div className="space-y-4">
+                          <label className="block text-xs font-bold uppercase tracking-[0.15em] text-slate-600">Special requests</label>
+                          <textarea
+                            name="notes"
+                            rows="5"
+                            placeholder="Add medical info or special requests..."
+                            value={formData.notes}
+                            onChange={handleInputChange}
+                            className="w-full rounded-xl border-2 border-slate-200 bg-white py-3.5 px-4 text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-1 focus:ring-primary/10 resize-none"
+                          />
                         </div>
-                        <div className="text-right">
-                          <span className="text-[10px] uppercase tracking-wider block" style={{ color: '#636366' }}>Total Booking Est.</span>
-                          <span className="text-lg font-bold text-white">${(trek.price * formData.groupSize).toLocaleString()}</span>
-                        </div>
-                      </div>
 
-                      {/* Submit */}
-                      <button
-                        type="submit"
-                        disabled={bookingLoading}
-                        className="w-full mt-2 flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
-                        style={{ background: '#5BB4FF', color: '#000' }}
-                      >
-                        {bookingLoading ? (
-                          <Loader2 className="h-5 w-5 animate-spin" />
-                        ) : (
-                          'Request Booking Reservation'
-                        )}
-                      </button>
-                    </>
-                  )}
-                </form>
-              )}
+                        <div className="rounded-xl border-2 border-slate-200 bg-gradient-to-br from-slate-50 to-slate-100 p-6 text-sm">
+                          <div className="flex items-center justify-between mb-4 pb-4 border-b border-slate-200">
+                            <span className="text-slate-600">Price per person</span>
+                            <span className="font-bold text-slate-900">${trek.price.toLocaleString()}</span>
+                          </div>
+                          <div className="flex items-center justify-between text-base font-bold text-slate-900">
+                            <span>Total estimate</span>
+                            <span className="text-primary text-xl">${(trek.price * formData.groupSize).toLocaleString()}</span>
+                          </div>
+                        </div>
+
+                        <button
+                          type="submit"
+                          disabled={bookingLoading}
+                          className="w-full rounded-xl bg-primary px-6 py-4 text-sm font-bold text-white transition btn-press disabled:opacity-60"
+                        >
+                          {bookingLoading ? (
+                            <>
+                              <Loader2 className="inline mr-2 h-5 w-5 animate-spin" />
+                              Processing...
+                            </>
+                          ) : (
+                            'Request Booking'
+                          )}
+                        </button>
+                      </>
+                    )}
+                  </form>
+                )}
+              </div>
             </div>
           </div>
         </div>

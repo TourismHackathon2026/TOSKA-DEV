@@ -1,5 +1,51 @@
 import { Users, Map, ShieldCheck, Star } from 'lucide-react';
 import { PLATFORM_STATS } from '../data/treks';
+import { useCountUp } from '../hooks/useCountUp';
+import { useScrollReveal } from '../hooks/useScrollReveal';
+
+function AnimatedStat({ label, value, icon: Icon, live, color, bgColor }) {
+  const [counterRef, displayValue] = useCountUp(value, 1600);
+
+  return (
+    <div
+      ref={counterRef}
+      className="flex items-center gap-4 p-6 sm:p-7 glass-card card-lift transition-all duration-300"
+      style={{
+        borderRadius: '18px',
+      }}
+    >
+      {/* Icon */}
+      <div
+        className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${bgColor} ${color}`}
+      >
+        <Icon className="h-6 w-6" />
+      </div>
+
+      {/* Content */}
+      <div className="flex flex-col">
+        <div className="flex items-center gap-2">
+          <span
+            className="text-2xl sm:text-3xl font-bold leading-none"
+            style={{ fontFamily: 'var(--font-heading)', color: '#1E293B' }}
+          >
+            {displayValue}
+          </span>
+          {live && <span className="live-dot" />}
+        </div>
+        <span
+          className="mt-2 text-xs font-medium"
+          style={{
+            color: '#64748B',
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+          }}
+        >
+          {label}
+        </span>
+      </div>
+    </div>
+  );
+}
 
 const STATS = [
   {
@@ -15,8 +61,8 @@ const STATS = [
     value: PLATFORM_STATS.totalTreks.toLocaleString(),
     icon: Map,
     live: false,
-    color: 'text-sky-400',
-    bgColor: 'bg-sky-400/10',
+    color: 'text-[#00965E]',
+    bgColor: 'bg-[#E5F5EE]',
   },
   {
     label: 'SOS Resolved',
@@ -37,49 +83,13 @@ const STATS = [
 ];
 
 export default function StatsBar() {
-  return (
-    <section className="mx-auto w-full max-w-7xl px-4 py-6 lg:px-8">
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {STATS.map(({ label, value, icon: Icon, live, color, bgColor }, i) => (
-          <div
-            key={label}
-            className={`animate-fadeInUp flex items-center gap-4 p-5 animate-delay-${(i + 1) * 100}`}
-            style={{
-              background: '#1A1A1A',
-              border: '1px solid #2A2A2A',
-              borderRadius: '12px',
-            }}
-          >
-            {/* Icon */}
-            <div
-              className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${bgColor} ${color}`}
-            >
-              <Icon className="h-5 w-5" />
-            </div>
+  const sectionRef = useScrollReveal();
 
-            {/* Content */}
-            <div className="flex flex-col">
-              <div className="flex items-center gap-2">
-                <span
-                  className="text-2xl font-bold leading-none"
-                  style={{ fontFamily: 'var(--font-heading)', color: '#FFFFFF' }}
-                >
-                  {value}
-                </span>
-                {live && <span className="live-dot" />}
-              </div>
-              <span
-                className="mt-1 text-xs font-medium"
-                style={{
-                  color: '#8E8E9A',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                }}
-              >
-                {label}
-              </span>
-            </div>
-          </div>
+  return (
+    <section ref={sectionRef} className="mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-16 py-8 lg:py-12">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 lg:gap-7">
+        {STATS.map((stat) => (
+          <AnimatedStat key={stat.label} {...stat} />
         ))}
       </div>
     </section>

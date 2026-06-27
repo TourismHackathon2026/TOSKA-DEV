@@ -1,9 +1,7 @@
-import { initializeApp} from 'firebase/app';
+import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
-import { getAnalytics } from 'firebase/analytics';
-import { getDatabase } from 'firebase/database';
-import { getStorage } from 'firebase/storage';
+
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -14,36 +12,33 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const googleProvider = new GoogleAuthProvider();
+let app, auth, db, googleProvider;
 
-// Initialize Analytics (supported in browser environments)
-let analytics;
-if (typeof window !== 'undefined') {
-  analytics = getAnalytics(app);
+try {
+  app = initializeApp(firebaseConfig);
+  auth = getAuth(app);
+  db = getFirestore(app);
+  googleProvider = new GoogleAuthProvider();
+  googleProvider.addScope('profile');
+  googleProvider.addScope('email');
+} catch (err) {
+  console.warn('Firebase init failed (check your .env credentials):', err.message);
+  // Provide stubs so imports don't break
+  auth = null;
+  db = null;
+  googleProvider = null;
 }
 
-// Request additional Google scopes
-googleProvider.addScope('profile');
-googleProvider.addScope('email');
+export { auth, db, googleProvider };
 
-export { auth, db, googleProvider, analytics };
 export const signInWithGoogle = async () => {
-  try {
-    await signInWithPopup(auth, googleProvider);
-  } catch (error) {
-    console.error('Google sign-in error:', error);
-    throw error;
-  }
+  if (!auth) throw new Error('Firebase not configured. Add credentials to .env');
+  await signInWithPopup(auth, googleProvider);
 };
+
 export const signOutUser = async () => {
-  try {
-    await signOut(auth);
-  } catch (error) {
-    console.error('Sign-out error:', error);
-    throw error;
-  }
+  if (!auth) return;
+  await signOut(auth);
 };
+
 export default app;

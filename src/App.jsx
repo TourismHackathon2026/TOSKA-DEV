@@ -6,6 +6,8 @@ import DashboardPage from './pages/DashboardPage';
 import WeatherPage from './pages/WeatherPage';
 import SafetyPage from './pages/SafetyPage';
 import AuthPage from './pages/AuthPage';
+import AdminPage from './pages/AdminPage';
+import GroupPage from './pages/GroupPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 export default function App() {
@@ -19,6 +21,22 @@ export default function App() {
           element={
             <ProtectedRoute>
               <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/groups"
+          element={
+            <ProtectedRoute>
+              <GroupPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <AdminPage />
             </ProtectedRoute>
           }
         />

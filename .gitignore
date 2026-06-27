@@ -14,7 +14,6 @@ dist-ssr
 *.gz
 
 # Editor directories and files
-.vscode/*
 !.vscode/extensions.json
 .idea
 .DS_Store
@@ -25,6 +24,18 @@ dist-ssr
 *.sw?
 
 # Environment files
-.env
-.env.*
+*.env
+*.pem
+*.p12
+*.key
+*.crt
 
+# Local runtime data and uploads
+server/data/
+server/uploads/
+*.db
+*.sqlite
+*.sqlite3
+*.serviceAccount*.json
+
+config.bat

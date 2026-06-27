@@ -1,9 +1,10 @@
+import { auth } from '../firebase';
+
 const API_BASE = '/api';
 
 // Get Firebase ID token for authenticated requests
 async function getAuthToken() {
-  const { auth } = await import('../firebase');
-  const user = auth.currentUser;
+  const user = auth?.currentUser;
   if (user) {
     return user.getIdToken();
   }

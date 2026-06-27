@@ -2,8 +2,9 @@ import HeroSection from '../components/HeroSection';
 import StatsBar from '../components/StatsBar';
 import FeaturedTreks from '../components/FeaturedTreks';
 import LiveDashboard from '../components/LiveDashboard';
-import WeatherPanel from '../components/WeatherPanel';
 import SafetyFeatures from '../components/SafetyFeatures';
+import TestimonialSection from '../components/TestimonialSection';
+import WeatherPanel from '../components/WeatherPanel';
 import CTASection from '../components/CTASection';
 
 export default function Home() {
@@ -14,6 +15,7 @@ export default function Home() {
       <FeaturedTreks />
       <LiveDashboard />
       <SafetyFeatures />
+      <TestimonialSection />
       <WeatherPanel />
       <CTASection />
     </>

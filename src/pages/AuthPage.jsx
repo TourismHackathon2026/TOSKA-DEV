@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import NEPAL_IMAGES from '../data/images';
 import {
   Mountain,
   Mail,
@@ -26,6 +27,7 @@ export default function AuthPage() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [activeField, setActiveField] = useState('');
 
   const { login, register, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
@@ -39,16 +41,36 @@ export default function AuthPage() {
     e.preventDefault();
     setError('');
     setSuccess('');
+
+    const trimmedName = formData.name.trim();
+    const trimmedEmail = formData.email.trim().toLowerCase();
+    const trimmedPassword = formData.password.trim();
+
+    if (!trimmedEmail || !trimmedPassword || (!isLogin && !trimmedName)) {
+      setError(isLogin ? 'Please enter your email and password.' : 'Please enter your full name, email, and password.');
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+
+    if (trimmedPassword.length < 6) {
+      setError('Password must be at least 6 characters long.');
+      return;
+    }
+
     setLoading(true);
 
     try {
       if (isLogin) {
-        await login(formData.email, formData.password);
+        await login(trimmedEmail, trimmedPassword);
       } else {
         await register({
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
+          name: trimmedName,
+          email: trimmedEmail,
+          password: trimmedPassword,
         });
         setSuccess('Account created successfully!');
       }
@@ -77,66 +99,55 @@ export default function AuthPage() {
     setIsLogin(!isLogin);
     setError('');
     setSuccess('');
+    setActiveField('');
     setFormData({ name: '', email: '', password: '' });
   };
 
+  const showFieldHint = (fieldName) => activeField !== fieldName && !formData[fieldName];
+
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-12 pt-24">
-      {/* ── Subtle Background ───────────────── */}
-      <div className="pointer-events-none absolute inset-0">
-        <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full opacity-[0.04]"
-          style={{ background: 'radial-gradient(circle, #5BB4FF, transparent 70%)' }}
-        />
-      </div>
+    <div
+      className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-12 pt-24"
+      style={{
+        backgroundImage: `linear-gradient(135deg, rgba(7, 23, 16, 0.86) 0%, rgba(0, 92, 60, 0.72) 45%, rgba(10, 25, 34, 0.88) 100%), url(${NEPAL_IMAGES.himalayaPanorama})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
+    >
+      {/* ── Scenic Overlay ───────────────── */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.2),_transparent_35%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,_rgba(255,255,255,0.08)_0%,_transparent_40%,_rgba(255,255,255,0.06)_100%)]" />
 
       {/* ── Auth Card ───────────────── */}
       <div className="animate-fadeInUp relative w-full max-w-md">
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center gap-3">
           <Link to="/" className="group flex items-center gap-2.5">
-            <div
-              className="flex h-12 w-12 items-center justify-center rounded-2xl transition-transform duration-300 group-hover:scale-110"
-              style={{ background: 'rgba(91,180,255,0.15)', color: '#5BB4FF' }}
-            >
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl transition-transform duration-300 group-hover:scale-110 shadow-sm bg-[rgba(0,150,94,0.1)] text-primary-dark">
               <Mountain className="h-6 w-6" />
             </div>
-            <span
-              className="text-2xl font-bold tracking-tight text-white"
-              style={{ fontFamily: 'var(--font-heading)' }}
-            >
+            <span className="text-2xl font-bold tracking-tight text-slate-800 font-heading">
               TrailGuard
             </span>
           </Link>
-          <p className="text-sm" style={{ color: '#8E8E9A' }}>
+          <p className="text-sm text-slate-500">
             {isLogin ? 'Welcome back, adventurer' : 'Begin your mountain journey'}
           </p>
         </div>
 
         {/* Card */}
-        <div
-          className="rounded-3xl p-8 shadow-2xl shadow-black/20"
-          style={{ background: '#1A1A1A', border: '1px solid #2A2A2A' }}
-        >
+        <div className="section-card glass-soft rounded-[28px] p-8 shadow-[0_30px_120px_rgba(2,12,8,0.35)]">
           {/* Tab Switcher */}
-          <div className="mb-6 flex rounded-xl p-1" style={{ background: '#111' }}>
+          <div className="mb-6 flex rounded-xl border border-[#DDEBE2] bg-[#F4F8F5] p-1">
             <button
               onClick={() => toggleMode()}
-              className={`flex-1 rounded-lg py-2.5 text-sm font-semibold transition-all duration-300`}
-              style={{
-                background: isLogin ? '#5BB4FF' : 'transparent',
-                color: isLogin ? '#000' : '#8E8E9A',
-              }}
+              className={`flex-1 rounded-lg py-2.5 text-sm font-semibold transition-all duration-300 cursor-pointer ${isLogin ? 'btn-primary-solid text-white' : 'btn-ghost text-slate-700'}`}
             >
               Sign In
             </button>
             <button
               onClick={() => toggleMode()}
-              className={`flex-1 rounded-lg py-2.5 text-sm font-semibold transition-all duration-300`}
-              style={{
-                background: !isLogin ? '#5BB4FF' : 'transparent',
-                color: !isLogin ? '#000' : '#8E8E9A',
-              }}
+              className={`flex-1 rounded-lg py-2.5 text-sm font-semibold transition-all duration-300 cursor-pointer ${!isLogin ? 'btn-primary-solid text-white' : 'btn-ghost text-slate-700'}`}
             >
               Register
             </button>
@@ -144,10 +155,7 @@ export default function AuthPage() {
 
           {/* Error Message */}
           {error && (
-            <div
-              className="animate-fadeIn mb-4 flex items-center gap-2 rounded-xl px-4 py-3 text-sm"
-              style={{ background: '#1A1A1A', borderLeft: '3px solid #FF453A', color: '#FF453A' }}
-            >
+            <div className="animate-fadeIn mb-4 flex items-center gap-2 rounded-xl border-l-4 border-red-600 bg-red-50 px-4 py-3 text-sm text-red-700">
               <AlertCircle className="h-4 w-4 shrink-0" />
               {error}
             </div>
@@ -155,10 +163,7 @@ export default function AuthPage() {
 
           {/* Success Message */}
           {success && (
-            <div
-              className="animate-fadeIn mb-4 flex items-center gap-2 rounded-xl px-4 py-3 text-sm"
-              style={{ background: '#1A1A1A', borderLeft: '3px solid #30D158', color: '#30D158' }}
-            >
+            <div className="animate-fadeIn mb-4 flex items-center gap-2 rounded-xl border-l-4 border-emerald-600 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
               <Sparkles className="h-4 w-4 shrink-0" />
               {success}
             </div>
@@ -169,8 +174,7 @@ export default function AuthPage() {
             id="google-signin-btn"
             onClick={handleGoogleSignIn}
             disabled={googleLoading}
-            className="group mb-5 flex w-full items-center justify-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-200 transition-all duration-300 hover:border-white/20 disabled:cursor-not-allowed disabled:opacity-50"
-            style={{ background: '#111', border: '1px solid #2A2A2A' }}
+            className="group mb-6 flex w-full items-center justify-center gap-3 rounded-xl btn-primary-outline disabled:cursor-not-allowed disabled:opacity-50"
           >
             {googleLoading ? (
               <Loader2 className="h-5 w-5 animate-spin" />
@@ -198,73 +202,84 @@ export default function AuthPage() {
           </button>
 
           {/* Divider */}
-          <div className="mb-5 flex items-center gap-3">
-            <div className="h-px flex-1" style={{ background: '#2A2A2A' }} />
-            <span className="text-xs" style={{ color: '#636366' }}>or continue with email</span>
-            <div className="h-px flex-1" style={{ background: '#2A2A2A' }} />
+          <div className="mb-7 mt-6 flex items-center gap-3">
+            <div className="h-px flex-1 bg-slate-200" />
+            <span className="text-xs font-medium text-slate-400">or continue with email</span>
+            <div className="h-px flex-1 bg-slate-200" />
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-8">
+          <form onSubmit={handleSubmit} className="mt-2 flex flex-col gap-5">
             {/* Name (Register only) */}
             {!isLogin && (
               <div className="animate-fadeIn group relative">
-                <User className="absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-slate-500 transition-colors group-focus-within:text-[#5BB4FF]" />
+                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.3em] text-slate-600">Full Name</label>
+                {showFieldHint('name') && (
+                  <div className="pointer-events-none absolute left-3.5 top-10 flex items-center gap-2 text-slate-400 transition-all duration-200">
+                    <User className="h-[16px] w-[16px]" />
+                  </div>
+                )}
                 <input
                   id="auth-name"
                   type="text"
                   name="name"
-                  placeholder="Full Name"
+                  placeholder="Enter your full name"
+                  aria-label="Full Name"
                   value={formData.name}
                   onChange={handleChange}
                   required={!isLogin}
-                  className="w-full rounded-xl py-3 pl-11 pr-4 text-sm text-white placeholder-slate-500 outline-none transition-all duration-300 focus:ring-1"
-                  style={{ background: '#111', border: '1px solid #2A2A2A' }}
-                  onFocus={(e) => { e.target.style.borderColor = '#5BB4FF'; }}
-                  onBlur={(e) => { e.target.style.borderColor = '#2A2A2A'; }}
+                  className="w-full rounded-2xl border border-[#DCE8DE] bg-[#F8FCF9] px-4 py-3.5 pl-11 text-sm text-slate-800 shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)] outline-none transition-all duration-300 placeholder:text-slate-400 focus:border-[#00965E] focus:bg-[#F5FFF9] focus:ring-2 focus:ring-[#00965E]/20"
                 />
               </div>
             )}
 
             {/* Email */}
             <div className="group relative">
-              <Mail className="absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-slate-500 transition-colors group-focus-within:text-[#5BB4FF]" />
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.3em] text-slate-600">Email Address</label>
+              {showFieldHint('email') && (
+                <div className="pointer-events-none absolute left-3.5 top-10 flex items-center gap-2 text-slate-400 transition-all duration-200">
+                  <Mail className="h-[16px] w-[16px]" />
+                </div>
+              )}
               <input
                 id="auth-email"
                 type="email"
                 name="email"
-                placeholder="Email address"
+                placeholder="Enter your email"
+                aria-label="Email"
+                autoComplete="email"
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full rounded-xl py-3 pl-11 pr-4 text-sm text-white placeholder-slate-500 outline-none transition-all duration-300 focus:ring-1"
-                style={{ background: '#111', border: '1px solid #2A2A2A' }}
-                onFocus={(e) => { e.target.style.borderColor = '#5BB4FF'; }}
-                onBlur={(e) => { e.target.style.borderColor = '#2A2A2A'; }}
+                className="w-full rounded-2xl border border-[#DCE8DE] bg-[#F8FCF9] px-4 py-3.5 pl-11 text-sm text-slate-800 shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)] outline-none transition-all duration-300 placeholder:text-slate-400 focus:border-[#00965E] focus:bg-[#F5FFF9] focus:ring-2 focus:ring-[#00965E]/20"
               />
             </div>
 
             {/* Password */}
             <div className="group relative">
-              <Lock className="absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-slate-500 transition-colors group-focus-within:text-[#5BB4FF]" />
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.3em] text-slate-600">Password</label>
+              {showFieldHint('password') && (
+                <div className="pointer-events-none absolute left-3.5 top-10 flex items-center gap-2 text-slate-400 transition-all duration-200">
+                  <Lock className="h-[16px] w-[16px]" />
+                </div>
+              )}
               <input
                 id="auth-password"
                 type={showPassword ? 'text' : 'password'}
                 name="password"
-                placeholder="Password"
+                placeholder="Enter your password"
+                aria-label="Password"
+                autoComplete="current-password"
                 value={formData.password}
                 onChange={handleChange}
                 required
                 minLength={6}
-                className="w-full rounded-xl py-3 pl-11 pr-12 text-sm text-white placeholder-slate-500 outline-none transition-all duration-300 focus:ring-1"
-                style={{ background: '#111', border: '1px solid #2A2A2A' }}
-                onFocus={(e) => { e.target.style.borderColor = '#5BB4FF'; }}
-                onBlur={(e) => { e.target.style.borderColor = '#2A2A2A'; }}
+                className="w-full rounded-2xl border border-[#DCE8DE] bg-[#F8FCF9] px-4 py-3.5 pl-11 pr-12 text-sm text-slate-800 shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)] outline-none transition-all duration-300 placeholder:text-slate-400 focus:border-[#00965E] focus:bg-[#F5FFF9] focus:ring-2 focus:ring-[#00965E]/20"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 transition-colors hover:text-slate-300"
+                className="absolute right-3.5 top-10 text-slate-400 transition-colors hover:text-slate-600"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? (
@@ -280,8 +295,7 @@ export default function AuthPage() {
               id="auth-submit-btn"
               type="submit"
               disabled={loading}
-              className="group mt-1 flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold uppercase tracking-wider transition-all duration-300 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-              style={{ background: '#5BB4FF', color: '#000' }}
+              className="btn-primary-solid group mt-4 flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-semibold uppercase tracking-wider disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
@@ -295,18 +309,18 @@ export default function AuthPage() {
           </form>
 
           {/* Footer text */}
-          <p className="mt-6 text-center text-xs" style={{ color: '#636366' }}>
+          <p className="mt-7 text-center text-xs text-slate-500">
             {isLogin ? (
               <>
                 Don&apos;t have an account?{' '}
-                <button onClick={toggleMode} style={{ color: '#5BB4FF' }} className="transition-colors hover:opacity-80">
+                <button onClick={toggleMode} className="transition-colors hover:opacity-80 font-bold text-primary-dark cursor-pointer">
                   Sign up free
                 </button>
               </>
             ) : (
               <>
                 Already have an account?{' '}
-                <button onClick={toggleMode} style={{ color: '#5BB4FF' }} className="transition-colors hover:opacity-80">
+                <button onClick={toggleMode} className="transition-colors hover:opacity-80 font-bold text-primary-dark cursor-pointer">
                   Sign in
                 </button>
               </>
@@ -315,7 +329,7 @@ export default function AuthPage() {
         </div>
 
         {/* Bottom Trust Badge */}
-        <div className="mt-6 flex items-center justify-center gap-2 text-xs" style={{ color: '#636366' }}>
+        <div className="mt-6 flex items-center justify-center gap-2 text-xs text-slate-400">
           <Lock className="h-3 w-3" />
           <span>Secured by Firebase Authentication</span>
         </div>
