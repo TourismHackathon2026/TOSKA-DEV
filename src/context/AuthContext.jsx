@@ -1,79 +1,163 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+  updateProfile as firebaseUpdateProfile,
+} from 'firebase/auth';
+import { auth, googleProvider } from '../firebase';
+import { syncUserToFirestore, updateUserProfile } from '../utils/firebaseService';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('trailguard_token'));
+  const [dbUser, setDbUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    if (token) {
-      fetch('/api/auth/me', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-        .then(res => res.ok ? res.json() : Promise.reject())
-        .then(data => { setUser(data.user); setLoading(false); })
-        .catch(() => { logout(); setLoading(false); });
-    } else {
-      setLoading(false);
+  // Sync Firebase user to Firestore DB
+  const syncUserToBackend = async (firebaseUser) => {
+    try {
+      const dbProfile = await syncUserToFirestore(firebaseUser);
+      setDbUser(dbProfile);
+      return dbProfile;
+    } catch (err) {
+      console.error('Failed to sync user to Firestore:', err);
     }
+    return null;
+  };
+
+  // Listen for Firebase auth state changes
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        setUser(firebaseUser);
+        await syncUserToBackend(firebaseUser);
+      } else {
+        setUser(null);
+        setDbUser(null);
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, []);
 
+  // Email/Password Login
   const login = async (email, password) => {
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Login failed');
-    localStorage.setItem('trailguard_token', data.token);
-    setToken(data.token);
-    setUser(data.user);
-    return data;
+    setError(null);
+    try {
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      const synced = await syncUserToBackend(result.user);
+      return { user: result.user, dbUser: synced };
+    } catch (err) {
+      console.error('Login error details:', err);
+      const message = err.code ? getFirebaseErrorMessage(err.code) : err.message || 'Authentication failed';
+      setError(message);
+      throw new Error(message);
+    }
   };
 
-  const register = async (formData) => {
-    const res = await fetch('/api/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Registration failed');
-    localStorage.setItem('trailguard_token', data.token);
-    setToken(data.token);
-    setUser(data.user);
-    return data;
+  // Email/Password Register
+  const register = async ({ name, email, password }) => {
+    setError(null);
+    try {
+      const result = await createUserWithEmailAndPassword(auth, email, password);
+      // Set display name in Firebase
+      await firebaseUpdateProfile(result.user, { displayName: name });
+      const synced = await syncUserToBackend(result.user);
+      return { user: result.user, dbUser: synced };
+    } catch (err) {
+      console.error('Register error details:', err);
+      const message = err.code ? getFirebaseErrorMessage(err.code) : err.message || 'Registration failed';
+      setError(message);
+      throw new Error(message);
+    }
   };
 
-  const logout = () => {
-    localStorage.removeItem('trailguard_token');
-    setToken(null);
-    setUser(null);
+  // Google Sign-In
+  const signInWithGoogle = async () => {
+    setError(null);
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const synced = await syncUserToBackend(result.user);
+      return { user: result.user, dbUser: synced };
+    } catch (err) {
+      const message = getFirebaseErrorMessage(err.code);
+      setError(message);
+      throw new Error(message);
+    }
   };
 
+  // Logout
+  const logout = async () => {
+    try {
+      await signOut(auth);
+      setUser(null);
+      setDbUser(null);
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
+  };
+
+  // Update profile
   const updateProfile = async (profileData) => {
-    const res = await fetch('/api/auth/profile', {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(profileData),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Update failed');
-    setUser(data.user);
-    return data;
+    if (!user) throw new Error('Not authenticated');
+
+    try {
+      const updatedUser = await updateUserProfile(user.uid, profileData);
+      setDbUser(updatedUser);
+      return updatedUser;
+    } catch (err) {
+      console.error('Failed to update profile:', err);
+      throw new Error(err.message || 'Profile update failed');
+    }
+  };
+
+  // Get current ID token (for API calls)
+  const getIdToken = async () => {
+    if (!user) return null;
+    return user.getIdToken();
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout, updateProfile }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        dbUser,
+        loading,
+        error,
+        login,
+        register,
+        signInWithGoogle,
+        logout,
+        updateProfile,
+        getIdToken,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
+}
+
+// Map Firebase error codes to user-friendly messages
+function getFirebaseErrorMessage(code) {
+  const messages = {
+    'auth/email-already-in-use': 'This email is already registered. Try logging in.',
+    'auth/invalid-email': 'Please enter a valid email address.',
+    'auth/weak-password': 'Password must be at least 6 characters.',
+    'auth/user-not-found': 'No account found with this email.',
+    'auth/wrong-password': 'Incorrect password. Please try again.',
+    'auth/invalid-credential': 'Invalid email or password.',
+    'auth/too-many-requests': 'Too many attempts. Please wait a moment.',
+    'auth/popup-closed-by-user': 'Sign-in popup was closed. Please try again.',
+    'auth/cancelled-popup-request': 'Sign-in was cancelled.',
+    'auth/operation-not-allowed': 'Email/password sign‑in is disabled. Enable it in Firebase console.',
+  };
+  return messages[code] || 'An authentication error occurred. Please try again.';
 }
 
 export const useAuth = () => {

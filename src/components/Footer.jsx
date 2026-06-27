@@ -36,40 +36,26 @@ const SOCIAL_ICONS = [
 
 export default function Footer() {
   return (
-    <footer className="glass-light relative mt-auto overflow-hidden">
-      {/* Gradient top border */}
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent-start to-transparent" />
-
+    <footer className="relative mt-auto" style={{ background: '#0A0A0A', borderTop: '1px solid #2A2A2A' }}>
       <div className="mx-auto max-w-7xl px-4 pb-8 pt-16 lg:px-8">
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
-          {/* ── Col 1: Brand ───────────────────── */}
           <div className="flex flex-col gap-5">
             <Link to="/" className="flex items-center gap-2 group">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-nature-500/20 text-nature-400 transition-transform duration-300 group-hover:scale-110">
-                <Mountain className="h-5 w-5" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg transition-opacity group-hover:opacity-80" style={{ background: 'rgba(91,180,255,0.12)' }}>
+                <Mountain className="h-5 w-5" style={{ color: '#5BB4FF' }} />
               </div>
-              <span
-                className="gradient-text text-xl font-bold tracking-tight"
-                style={{ fontFamily: 'var(--font-heading)' }}
-              >
-                TrailGuard
-              </span>
+              <span className="text-xl font-bold tracking-tight text-white" style={{ fontFamily: 'var(--font-heading)' }}>TrailGuard</span>
             </Link>
-
-            <p className="max-w-xs text-sm leading-relaxed text-slate-400">
-              Nepal's smartest trekking platform — real-time GPS tracking,
-              weather intelligence, and emergency SOS for every Himalayan
-              adventure.
+            <p style={{ color: '#636366', fontSize: '14px', lineHeight: '1.6', maxWidth: '280px' }}>
+              Nepal's smartest trekking platform &mdash; real-time GPS tracking, weather intelligence, and emergency SOS for every Himalayan adventure.
             </p>
-
-            {/* Social Icons */}
             <div className="flex items-center gap-3">
               {SOCIAL_ICONS.map(({ icon: Icon, label, href }) => (
-                <a
-                  key={label}
-                  href={href}
-                  aria-label={label}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5 text-slate-400 transition-all duration-200 hover:bg-white/10 hover:text-white hover:scale-110"
+                <a key={label} href={href} aria-label={label}
+                  className="flex h-9 w-9 items-center justify-center rounded-lg transition-all duration-200"
+                  style={{ background: '#1A1A1A', border: '1px solid #2A2A2A', color: '#636366' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#5BB4FF'; e.currentTarget.style.color = '#5BB4FF'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#2A2A2A'; e.currentTarget.style.color = '#636366'; }}
                 >
                   <Icon className="h-4 w-4" />
                 </a>
@@ -77,22 +63,16 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* ── Col 2: Explore ─────────────────── */}
           <div>
-            <h4
-              className="mb-4 text-sm font-semibold uppercase tracking-wider text-white"
-              style={{ fontFamily: 'var(--font-heading)' }}
-            >
-              Explore
-            </h4>
+            <h4 className="mb-4 text-[11px] font-semibold uppercase" style={{ color: '#8E8E9A', letterSpacing: '0.08em', fontFamily: 'var(--font-heading)' }}>Explore</h4>
             <ul className="flex flex-col gap-2.5">
               {EXPLORE_LINKS.map(({ label, path }) => (
                 <li key={path}>
-                  <Link
-                    to={path}
-                    className="group flex items-center gap-1.5 text-sm text-slate-400 transition-colors hover:text-white"
+                  <Link to={path} className="group flex items-center gap-1.5 text-sm transition-colors" style={{ color: '#636366' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = '#FFF'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = '#636366'; }}
                   >
-                    <ChevronRight className="h-3 w-3 text-nature-500 opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-0.5" />
+                    <ChevronRight className="h-3 w-3 opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-0.5" style={{ color: '#5BB4FF' }} />
                     {label}
                   </Link>
                 </li>
@@ -100,22 +80,16 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* ── Col 3: Platform ────────────────── */}
           <div>
-            <h4
-              className="mb-4 text-sm font-semibold uppercase tracking-wider text-white"
-              style={{ fontFamily: 'var(--font-heading)' }}
-            >
-              Platform
-            </h4>
+            <h4 className="mb-4 text-[11px] font-semibold uppercase" style={{ color: '#8E8E9A', letterSpacing: '0.08em', fontFamily: 'var(--font-heading)' }}>Platform</h4>
             <ul className="flex flex-col gap-2.5">
               {PLATFORM_LINKS.map(({ label, path }) => (
                 <li key={path}>
-                  <Link
-                    to={path}
-                    className="group flex items-center gap-1.5 text-sm text-slate-400 transition-colors hover:text-white"
+                  <Link to={path} className="group flex items-center gap-1.5 text-sm transition-colors" style={{ color: '#636366' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = '#FFF'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = '#636366'; }}
                   >
-                    <ChevronRight className="h-3 w-3 text-sky-500 opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-0.5" />
+                    <ChevronRight className="h-3 w-3 opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-0.5" style={{ color: '#5BB4FF' }} />
                     {label}
                   </Link>
                 </li>
@@ -123,38 +97,28 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* ── Col 4: Contact ─────────────────── */}
           <div>
-            <h4
-              className="mb-4 text-sm font-semibold uppercase tracking-wider text-white"
-              style={{ fontFamily: 'var(--font-heading)' }}
-            >
-              Contact
-            </h4>
+            <h4 className="mb-4 text-[11px] font-semibold uppercase" style={{ color: '#8E8E9A', letterSpacing: '0.08em', fontFamily: 'var(--font-heading)' }}>Contact</h4>
             <ul className="flex flex-col gap-4">
-              <li className="flex items-start gap-3 text-sm text-slate-400">
-                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-nature-400" />
-                <span>
-                  Tridevi Marg, Thamel
-                  <br />
-                  Kathmandu 44600, Nepal
-                </span>
+              <li className="flex items-start gap-3 text-sm" style={{ color: '#636366' }}>
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0" style={{ color: '#5BB4FF' }} />
+                <span>Tridevi Marg, Thamel<br />Kathmandu 44600, Nepal</span>
               </li>
               <li>
-                <a
-                  href="tel:+977-1-4700000"
-                  className="flex items-center gap-3 text-sm text-slate-400 transition-colors hover:text-white"
+                <a href="tel:+977-1-4700000" className="flex items-center gap-3 text-sm transition-colors" style={{ color: '#636366' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.color = '#FFF'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.color = '#636366'; }}
                 >
-                  <Phone className="h-4 w-4 shrink-0 text-sky-400" />
+                  <Phone className="h-4 w-4 shrink-0" style={{ color: '#5BB4FF' }} />
                   +977-1-4700000
                 </a>
               </li>
               <li>
-                <a
-                  href="mailto:info@trailguard.com.np"
-                  className="flex items-center gap-3 text-sm text-slate-400 transition-colors hover:text-white"
+                <a href="mailto:info@trailguard.com.np" className="flex items-center gap-3 text-sm transition-colors" style={{ color: '#636366' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.color = '#FFF'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.color = '#636366'; }}
                 >
-                  <Mail className="h-4 w-4 shrink-0 text-accent-mid" />
+                  <Mail className="h-4 w-4 shrink-0" style={{ color: '#5BB4FF' }} />
                   info@trailguard.com.np
                 </a>
               </li>
@@ -162,15 +126,9 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* ── Bottom Bar ───────────────────────── */}
-        <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-white/8 pt-6 sm:flex-row">
-          <p className="text-xs text-slate-500">
-            &copy; {new Date().getFullYear()} TrailGuard Nepal. All rights
-            reserved.
-          </p>
-          <p className="text-xs text-slate-500">
-            Made with <span className="text-safety-red">❤️</span> in Nepal
-          </p>
+        <div className="mt-12 flex flex-col items-center justify-between gap-3 pt-6 sm:flex-row" style={{ borderTop: '1px solid #2A2A2A' }}>
+          <p className="text-xs" style={{ color: '#636366' }}>&copy; {new Date().getFullYear()} TrailGuard Nepal. All rights reserved.</p>
+          <p className="text-xs" style={{ color: '#636366' }}>Made with <span style={{ color: '#FF453A' }}>&#x2764;&#xFE0F;</span> in Nepal</p>
         </div>
       </div>
     </footer>

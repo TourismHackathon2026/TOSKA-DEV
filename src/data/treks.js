@@ -210,7 +210,7 @@ export const FEATURED_TREKS = [
 
 // Mock active trekker data for dashboard
 export const ACTIVE_TREKKERS = [
-  { id: 1, name: 'Pemba Sherpa', trek: 'Everest Base Camp', altitude: 4850, battery: 72, speed: 1.2, status: 'active', lat: 27.9881, lng: 86.9250 },
+  { id: 1, name: 'Pemba Sherpa', trek: 'Everest Base Camp', altitude: 4850, battery: 72, speed: 1.2, status: 'active', lat: 27.9881, lng: 86.9250, valid: false },
   { id: 2, name: 'Sarah Chen', trek: 'Annapurna Circuit', altitude: 3540, battery: 45, speed: 0.8, status: 'active', lat: 28.5962, lng: 83.8203 },
   { id: 3, name: 'Rajesh Tamang', trek: 'Langtang Valley', altitude: 3700, battery: 89, speed: 1.5, status: 'active', lat: 28.2096, lng: 85.5189 },
   { id: 4, name: 'Maria Garcia', trek: 'Manaslu Circuit', altitude: 4200, battery: 33, speed: 0.5, status: 'warning', lat: 28.5497, lng: 84.5597 },

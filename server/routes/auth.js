@@ -123,4 +123,49 @@ router.put('/profile', auth, (req, res) => {
   }
 });
 
+// POST /api/auth/sync — Sync Firebase user to local SQLite DB
+router.post('/sync', auth, (req, res) => {
+  try {
+    const { uid, email, name, picture } = req.firebaseUser;
+
+    // Check if user exists by firebase_uid
+    let user = db.prepare('SELECT * FROM users WHERE firebase_uid = ?').get(uid);
+
+    if (!user) {
+      // If user doesn't exist by firebase_uid, check by email
+      user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
+      
+      if (user) {
+        // Link firebase_uid to existing user
+        db.prepare('UPDATE users SET firebase_uid = ?, avatar = COALESCE(?, avatar) WHERE id = ?')
+          .run(uid, picture, user.id);
+        user = db.prepare('SELECT * FROM users WHERE id = ?').get(user.id);
+      } else {
+        // Create new user record
+        const result = db.prepare(`
+          INSERT INTO users (firebase_uid, name, email, avatar)
+          VALUES (?, ?, ?, ?)
+        `).run(uid, name, email, picture || 'default-avatar.png');
+        user = db.prepare('SELECT * FROM users WHERE id = ?').get(result.lastInsertRowid);
+      }
+    }
+
+    res.json({
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        emergency_contact: user.emergency_contact,
+        avatar: user.avatar,
+        role: user.role,
+        created_at: user.created_at
+      }
+    });
+  } catch (error) {
+    console.error('Sync user error:', error);
+    res.status(500).json({ error: 'Failed to sync user' });
+  }
+});
+
 export default router;

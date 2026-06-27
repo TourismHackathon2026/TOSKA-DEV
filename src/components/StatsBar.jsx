@@ -43,11 +43,12 @@ export default function StatsBar() {
         {STATS.map(({ label, value, icon: Icon, live, color, bgColor }, i) => (
           <div
             key={label}
-            className={`
-              glass-card animate-fadeInUp flex items-center gap-4 p-5
-              animate-delay-${(i + 1) * 100}
-              ${live ? 'animate-breathe' : ''}
-            `}
+            className={`animate-fadeInUp flex items-center gap-4 p-5 animate-delay-${(i + 1) * 100}`}
+            style={{
+              background: '#1A1A1A',
+              border: '1px solid #2A2A2A',
+              borderRadius: '12px',
+            }}
           >
             {/* Icon */}
             <div
@@ -60,14 +61,21 @@ export default function StatsBar() {
             <div className="flex flex-col">
               <div className="flex items-center gap-2">
                 <span
-                  className="gradient-text text-2xl font-bold leading-none"
-                  style={{ fontFamily: 'var(--font-heading)' }}
+                  className="text-2xl font-bold leading-none"
+                  style={{ fontFamily: 'var(--font-heading)', color: '#FFFFFF' }}
                 >
                   {value}
                 </span>
                 {live && <span className="live-dot" />}
               </div>
-              <span className="mt-1 text-xs font-medium text-slate-400">
+              <span
+                className="mt-1 text-xs font-medium"
+                style={{
+                  color: '#8E8E9A',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                }}
+              >
                 {label}
               </span>
             </div>

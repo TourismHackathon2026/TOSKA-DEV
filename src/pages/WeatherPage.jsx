@@ -2,7 +2,7 @@ import WeatherPanel from '../components/WeatherPanel';
 
 export default function WeatherPage() {
   return (
-    <main className="min-h-screen pt-8">
+    <main style={{ minHeight: '100vh', paddingTop: '2rem', background: '#000' }}>
       <WeatherPanel />
     </main>
   );

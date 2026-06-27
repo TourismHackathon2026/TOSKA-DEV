@@ -1,16 +1,27 @@
 const API_BASE = '/api';
 
-function getHeaders() {
-  const token = localStorage.getItem('trailguard_token');
+// Get Firebase ID token for authenticated requests
+async function getAuthToken() {
+  const { auth } = await import('../firebase');
+  const user = auth.currentUser;
+  if (user) {
+    return user.getIdToken();
+  }
+  return null;
+}
+
+async function getHeaders() {
+  const token = await getAuthToken();
   const headers = { 'Content-Type': 'application/json' };
   if (token) headers.Authorization = `Bearer ${token}`;
   return headers;
 }
 
 async function request(endpoint, options = {}) {
+  const headers = await getHeaders();
   const res = await fetch(`${API_BASE}${endpoint}`, {
     ...options,
-    headers: { ...getHeaders(), ...options.headers },
+    headers: { ...headers, ...options.headers },
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || 'Request failed');
@@ -19,8 +30,7 @@ async function request(endpoint, options = {}) {
 
 export const api = {
   // Auth
-  login: (email, password) => request('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
-  register: (formData) => request('/auth/register', { method: 'POST', body: JSON.stringify(formData) }),
+  syncUser: () => request('/auth/sync', { method: 'POST', body: JSON.stringify({}) }),
   getProfile: () => request('/auth/me'),
   updateProfile: (data) => request('/auth/profile', { method: 'PUT', body: JSON.stringify(data) }),
 

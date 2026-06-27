@@ -1,12 +1,66 @@
 import { useState } from 'react';
-import { AlertTriangle, X, Phone } from 'lucide-react';
+import { AlertTriangle, X, Phone, Loader2 } from 'lucide-react';
+import { sendSOSAlert } from '../utils/firebaseService';
 
 /**
  * SOSButton — prominent emergency SOS trigger with a confirmation modal.
  * Uses the `sos-pulse` CSS class for the pulsing radar animation.
+ * Retrieves real coordinates using geolocation API and dispatches them to Firestore.
  */
 export default function SOSButton() {
   const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleConfirmSOS = () => {
+    setLoading(true);
+
+    const fallbackSend = async () => {
+      try {
+        await sendSOSAlert({
+          latitude: 27.9881,
+          longitude: 86.9250,
+          altitude: 5364,
+          message: 'Emergency SOS manual trigger (GPS coordinates unavailable)',
+        });
+        alert('🚨 SOS Dispatched! Emergency dispatchers have been notified.');
+      } catch (err) {
+        console.error('SOS failed:', err);
+        alert('Failed to send SOS: ' + err.message);
+      } finally {
+        setLoading(false);
+        setIsOpen(false);
+      }
+    };
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            await sendSOSAlert({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+              altitude: position.coords.altitude || 0,
+              message: 'Emergency SOS manual trigger via Web App Dashboard',
+            });
+            alert(`🚨 SOS Dispatched! Location coordinates sent:\nLat: ${position.coords.latitude.toFixed(4)}\nLng: ${position.coords.longitude.toFixed(4)}`);
+          } catch (err) {
+            console.error('SOS failed:', err);
+            alert('Failed to send SOS: ' + err.message);
+          } finally {
+            setLoading(false);
+            setIsOpen(false);
+          }
+        },
+        (error) => {
+          console.warn('Geolocation blocked or unavailable. Falling back to default region.', error);
+          fallbackSend();
+        },
+        { enableHighAccuracy: true, timeout: 5000 }
+      );
+    } else {
+      fallbackSend();
+    }
+  };
 
   return (
     <>
@@ -16,8 +70,8 @@ export default function SOSButton() {
         onClick={() => setIsOpen(true)}
         className="sos-pulse inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-white font-bold text-lg tracking-wide cursor-pointer select-none transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400/50"
         style={{
-          background: 'linear-gradient(135deg, var(--color-safety-red), #dc2626)',
-          boxShadow: '0 0 24px rgba(239, 68, 68, 0.45), inset 0 1px 0 rgba(255,255,255,0.12)',
+          background: '#FF453A',
+          boxShadow: '0 0 24px rgba(255, 69, 58, 0.45)',
         }}
         aria-label="Activate SOS Emergency"
       >
@@ -29,20 +83,28 @@ export default function SOSButton() {
       {isOpen && (
         <div
           className="fixed inset-0 z-[9999] flex items-center justify-center px-4 animate-fadeIn"
-          style={{ background: 'rgba(0, 0, 0, 0.7)', backdropFilter: 'blur(8px)' }}
-          onClick={() => setIsOpen(false)}
+          style={{ background: 'rgba(0, 0, 0, 0.85)' }}
+          onClick={() => {
+            if (!loading) setIsOpen(false);
+          }}
         >
           <div
-            className="glass relative w-full max-w-md rounded-2xl p-8 text-center animate-fadeInUp"
+            className="relative w-full max-w-md rounded-2xl p-8 text-center animate-fadeInUp"
             style={{
-              boxShadow: '0 0 60px rgba(239, 68, 68, 0.2), 0 24px 48px rgba(0,0,0,0.5)',
+              background: '#1A1A1A',
+              border: '1px solid #2A2A2A',
+              boxShadow: '0 0 60px rgba(255, 69, 58, 0.2), 0 24px 48px rgba(0,0,0,0.5)',
             }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close */}
             <button
               onClick={() => setIsOpen(false)}
-              className="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors cursor-pointer"
+              disabled={loading}
+              className="absolute top-4 right-4 transition-colors cursor-pointer disabled:opacity-50"
+              style={{ color: '#636366' }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = '#FFF'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = '#636366'; }}
               aria-label="Close modal"
             >
               <X size={20} />
@@ -52,11 +114,11 @@ export default function SOSButton() {
             <div
               className="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center"
               style={{
-                background: 'linear-gradient(135deg, rgba(239,68,68,0.2), rgba(220,38,38,0.15))',
-                border: '1px solid rgba(239,68,68,0.3)',
+                background: '#1A1A1A',
+                border: '1px solid rgba(255,69,58,0.3)',
               }}
             >
-              <AlertTriangle size={36} className="text-red-400" strokeWidth={2} />
+              <AlertTriangle size={36} style={{ color: '#FF453A' }} strokeWidth={2} />
             </div>
 
             {/* Title */}
@@ -68,7 +130,7 @@ export default function SOSButton() {
             </h3>
 
             {/* Message */}
-            <p className="text-slate-400 text-sm leading-relaxed mb-8 max-w-xs mx-auto">
+            <p style={{ color: '#8E8E9A', fontSize: '14px', lineHeight: '1.6', maxWidth: '320px', margin: '0 auto 2rem' }}>
               This will broadcast your GPS coordinates to local rescue teams and
               Nepal Mountain Rescue. Only activate in a genuine emergency.
             </p>
@@ -77,25 +139,32 @@ export default function SOSButton() {
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 id="sos-confirm-button"
-                onClick={() => {
-                  // In production this would trigger rescue APIs
-                  alert('🚨 SOS Activated! Rescue teams notified with your GPS coordinates.');
-                  setIsOpen(false);
-                }}
-                className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-white font-bold text-sm tracking-wide cursor-pointer transition-all duration-300 hover:scale-[1.02] active:scale-95 focus:outline-none"
+                onClick={handleConfirmSOS}
+                disabled={loading}
+                className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-white font-bold text-sm tracking-wide cursor-pointer transition-all duration-300 hover:scale-[1.02] active:scale-95 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
-                  background: 'linear-gradient(135deg, var(--color-safety-red), #dc2626)',
-                  boxShadow: '0 0 20px rgba(239,68,68,0.35)',
+                  background: '#FF453A',
+                  boxShadow: '0 0 20px rgba(255,69,58,0.35)',
                 }}
               >
-                <Phone size={16} />
+                {loading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Phone size={16} />
+                )}
                 Confirm SOS
               </button>
 
               <button
                 id="sos-cancel-button"
                 onClick={() => setIsOpen(false)}
-                className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl glass text-slate-300 font-semibold text-sm tracking-wide cursor-pointer transition-all duration-300 hover:bg-white/10 hover:text-white active:scale-95 focus:outline-none"
+                disabled={loading}
+                className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-sm tracking-wide cursor-pointer transition-all duration-300 hover:text-white active:scale-95 focus:outline-none disabled:opacity-50"
+                style={{
+                  background: '#111',
+                  border: '1px solid #2A2A2A',
+                  color: '#8E8E9A',
+                }}
               >
                 Cancel
               </button>

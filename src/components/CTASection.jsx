@@ -29,22 +29,6 @@ export default function CTASection() {
       id="cta-section"
       className="relative py-24 sm:py-32 px-6 sm:px-10 lg:px-16 overflow-hidden"
     >
-      {/* ── Radial gradient glow background ── */}
-      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-        <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full"
-          style={{
-            background: 'radial-gradient(circle, rgba(61,122,71,0.15) 0%, rgba(10,126,245,0.08) 40%, transparent 70%)',
-          }}
-        />
-        <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full"
-          style={{
-            background: 'radial-gradient(circle, rgba(130,140,248,0.1) 0%, transparent 60%)',
-          }}
-        />
-      </div>
-
       <div className="relative max-w-4xl mx-auto text-center">
         {/* ── Text ── */}
         <div className="animate-fadeInUp">
@@ -53,9 +37,9 @@ export default function CTASection() {
             style={{ fontFamily: 'var(--font-heading)' }}
           >
             Ready to Trek{' '}
-            <span className="gradient-text">Smarter?</span>
+            <span style={{ color: '#5BB4FF' }}>Smarter?</span>
           </h2>
-          <p className="text-slate-400 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed mb-10">
+          <p className="text-base sm:text-lg max-w-2xl mx-auto leading-relaxed mb-10" style={{ color: '#8E8E9A' }}>
             Join thousands of trekkers who trust TrailGuard Nepal for real-time GPS tracking,
             emergency SOS, and intelligent route planning across the Himalayas.
           </p>
@@ -66,7 +50,13 @@ export default function CTASection() {
           <Link
             to="/explore"
             id="cta-start-tracking"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-nature-500 text-white font-bold text-base tracking-wide transition-all duration-300 hover:bg-nature-400 hover:scale-[1.03] hover:shadow-[0_0_28px_rgba(61,122,71,0.45)] active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-nature-400/60"
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-base transition-all duration-300 hover:scale-[1.03] hover:brightness-110 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/60"
+            style={{
+              background: '#5BB4FF',
+              color: '#000',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+            }}
           >
             Start Free Tracking
             <ArrowRight size={18} />
@@ -75,7 +65,20 @@ export default function CTASection() {
           <Link
             to="/dashboard"
             id="cta-view-dashboard"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-xl glass text-slate-200 font-semibold text-base tracking-wide border border-white/10 transition-all duration-300 hover:bg-white/10 hover:text-white hover:border-white/20 hover:scale-[1.03] active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20"
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-semibold text-base transition-all duration-300 hover:scale-[1.03] active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20"
+            style={{
+              background: 'transparent',
+              border: '1px solid #2A2A2A',
+              color: '#8E8E9A',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#5BB4FF';
+              e.currentTarget.style.color = '#FFF';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = '#2A2A2A';
+              e.currentTarget.style.color = '#8E8E9A';
+            }}
           >
             View Live Dashboard
           </Link>
@@ -88,7 +91,8 @@ export default function CTASection() {
             return (
               <div
                 key={s.label}
-                className="glass-card flex flex-col items-center py-6 px-4 text-center"
+                className="flex flex-col items-center py-6 px-4 text-center rounded-xl"
+                style={{ background: '#1A1A1A', border: '1px solid #2A2A2A' }}
               >
                 <Icon size={20} className={`${s.color} mb-2`} />
                 <span
@@ -97,7 +101,10 @@ export default function CTASection() {
                 >
                   {s.value}
                 </span>
-                <span className="text-[11px] text-slate-500 uppercase tracking-widest font-medium">
+                <span
+                  className="text-[11px] uppercase tracking-widest font-medium"
+                  style={{ color: '#8E8E9A' }}
+                >
                   {s.label}
                 </span>
               </div>

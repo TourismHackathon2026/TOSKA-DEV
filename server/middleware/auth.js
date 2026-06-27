@@ -1,8 +1,9 @@
-import jwt from 'jsonwebtoken';
+import admin from '../firebase-admin.js';
+import { db } from '../db.js';
 
-const JWT_SECRET = 'TRAILGUARD_JWT_SECRET_2026';
+export const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me';
 
-function auth(req, res, next) {
+async function auth(req, res, next) {
   try {
     const authHeader = req.headers.authorization;
 
@@ -10,20 +11,33 @@ function auth(req, res, next) {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
-    const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const idToken = authHeader.split(' ')[1];
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
 
-    req.user = {
-      id: decoded.id,
-      email: decoded.email,
-      role: decoded.role
+    req.firebaseUser = {
+      uid: decodedToken.uid,
+      email: decodedToken.email,
+      name: decodedToken.name || decodedToken.email?.split('@')[0] || 'User',
+      picture: decodedToken.picture || null,
+      emailVerified: decodedToken.email_verified || false,
     };
+
+    // Look up local user for backward compatibility with other routes
+    const localUser = db.prepare('SELECT * FROM users WHERE firebase_uid = ?').get(decodedToken.uid);
+    if (localUser) {
+      req.user = {
+        id: localUser.id,
+        email: localUser.email,
+        role: localUser.role,
+      };
+    }
 
     next();
   } catch (error) {
-    return res.status(401).json({ error: 'Invalid token' });
+    console.error('Auth middleware error:', error.message);
+    return res.status(401).json({ error: 'Invalid or expired token' });
   }
 }
 
-export { auth, JWT_SECRET };
+export { auth };
 export default auth;

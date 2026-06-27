@@ -3,9 +3,9 @@ import SOSButton from '../components/SOSButton';
 
 export default function SafetyPage() {
   return (
-    <main className="min-h-screen pt-8">
+    <main style={{ minHeight: '100vh', paddingTop: '2rem', background: '#000' }}>
       <SafetyFeatures />
-      <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-20">
+      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 1.5rem 5rem' }}>
         <SOSButton />
       </div>
     </main>

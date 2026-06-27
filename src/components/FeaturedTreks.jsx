@@ -28,8 +28,11 @@ export default function FeaturedTreks() {
     <section id="featured-treks" className="py-20 sm:py-28 px-6 sm:px-10 lg:px-16 max-w-7xl mx-auto">
       {/* ── Header ── */}
       <div className="text-center mb-12 sm:mb-16">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass text-sm text-nature-300 font-medium mb-5">
-          <Compass size={16} className="text-nature-400" />
+        <div
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium mb-5"
+          style={{ background: '#1A1A1A', border: '1px solid #2A2A2A', color: '#8E8E9A' }}
+        >
+          <Compass size={16} style={{ color: '#8E8E9A' }} />
           Curated Adventures
         </div>
         <h2
@@ -37,9 +40,9 @@ export default function FeaturedTreks() {
           style={{ fontFamily: "var(--font-heading)" }}
         >
           Explore Nepal's{' '}
-          <span className="gradient-text">Iconic Trails</span>
+          <span style={{ color: '#5BB4FF' }}>Iconic Trails</span>
         </h2>
-        <p className="text-slate-400 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+        <p className="text-base sm:text-lg max-w-2xl mx-auto leading-relaxed" style={{ color: '#8E8E9A' }}>
           From the legendary Everest Base Camp to the hidden valleys of Dolpo — discover world-class treks
           powered by real-time smart tracking and safety intelligence.
         </p>
@@ -57,12 +60,18 @@ export default function FeaturedTreks() {
                 setActiveFilter(tab);
                 setShowAll(false); // reset when switching filters
               }}
-              className={`px-5 py-2 rounded-full text-sm font-semibold tracking-wide transition-all duration-300
-                ${
-                  isActive
-                    ? 'bg-nature-500 text-white shadow-lg shadow-nature-500/25'
-                    : 'glass text-slate-400 hover:text-white hover:border-white/20'
-                }`}
+              className="px-5 py-2 rounded-full text-sm font-semibold tracking-wide transition-all duration-300"
+              style={
+                isActive
+                  ? { background: '#5BB4FF', color: '#000' }
+                  : { background: '#1A1A1A', border: '1px solid #2A2A2A', color: '#8E8E9A' }
+              }
+              onMouseEnter={(e) => {
+                if (!isActive) e.currentTarget.style.color = '#FFF';
+              }}
+              onMouseLeave={(e) => {
+                if (!isActive) e.currentTarget.style.color = '#8E8E9A';
+              }}
             >
               {tab}
             </button>
@@ -85,7 +94,7 @@ export default function FeaturedTreks() {
         </div>
       ) : (
         <div className="text-center py-16">
-          <p className="text-slate-500 text-lg">No treks found for "{activeFilter}" difficulty.</p>
+          <p className="text-lg" style={{ color: '#8E8E9A' }}>No treks found for "{activeFilter}" difficulty.</p>
         </div>
       )}
 
@@ -95,10 +104,16 @@ export default function FeaturedTreks() {
           <button
             id="toggle-treks"
             onClick={() => setShowAll((prev) => !prev)}
-            className="group inline-flex items-center gap-2 px-8 py-3 rounded-xl text-sm font-semibold
-                       glass border border-white/10 text-slate-300
-                       hover:text-white hover:border-nature-400/40 hover:shadow-lg hover:shadow-nature-500/10
-                       transition-all duration-300"
+            className="group inline-flex items-center gap-2 px-8 py-3 rounded-xl text-sm font-semibold transition-all duration-300"
+            style={{ background: 'transparent', border: '1px solid #2A2A2A', color: '#8E8E9A' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#5BB4FF';
+              e.currentTarget.style.color = '#FFF';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = '#2A2A2A';
+              e.currentTarget.style.color = '#8E8E9A';
+            }}
           >
             {showAll ? 'Show Less' : 'View All Treks'}
             <span

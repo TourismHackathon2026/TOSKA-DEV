@@ -1,12 +1,14 @@
+import { useState, useEffect } from 'react';
 import { Radio, Mountain, Battery, Gauge, AlertTriangle, CloudLightning, MapPin, Shield, Zap } from 'lucide-react';
-import { ACTIVE_TREKKERS, ALERTS } from '../data/treks';
+import { ALERTS } from '../data/treks';
+import { subscribeToLiveTrekkers, subscribeToAlerts } from '../utils/firebaseService';
 
 /**
  * Returns a pseudo-random position (%) for each trekker on the simulated map.
  * Uses a deterministic seed from the trekker id so dots stay stable across renders.
  */
 function trekkerPosition(trekker) {
-  const seed = trekker.id * 7919; // prime-based seed
+  const seed = Number(trekker.id) * 7919; // prime-based seed
   const x = ((seed * 13) % 80) + 10;  // 10–90 %
   const y = ((seed * 29) % 70) + 15;  // 15–85 %
   return { x, y };
@@ -49,6 +51,24 @@ function alertIcon(type) {
 }
 
 export default function LiveDashboard() {
+  const [liveTrekkers, setLiveTrekkers] = useState([]);
+  const [alerts, setAlerts] = useState(ALERTS);
+  const filteredTrekkers = liveTrekkers.filter(t => t.valid !== false);
+
+  useEffect(() => {
+    const unsubscribeTrekkers = subscribeToLiveTrekkers(setLiveTrekkers);
+    const unsubscribeAlerts = subscribeToAlerts((data) => {
+      if (data.length > 0) {
+        setAlerts(data);
+      }
+    });
+
+    return () => {
+      unsubscribeTrekkers();
+      unsubscribeAlerts();
+    };
+  }, []);
+
   return (
     <section
       id="live-dashboard"
@@ -115,7 +135,7 @@ export default function LiveDashboard() {
             </div>
 
             {/* Trekker dots */}
-            {ACTIVE_TREKKERS.map((t) => {
+            {filteredTrekkers.map((t) => {
               const pos = trekkerPosition(t);
               const color =
                 t.status === 'critical'
@@ -169,12 +189,12 @@ export default function LiveDashboard() {
             <MapPin size={15} className="text-nature-400" />
             Active Trekkers
             <span className="ml-auto text-[10px] font-bold text-nature-400 bg-nature-500/15 px-2 py-0.5 rounded-full">
-              {ACTIVE_TREKKERS.length}
+              {filteredTrekkers.length}
             </span>
           </h3>
 
           <div className="flex-1 overflow-y-auto space-y-2.5 pr-1 max-h-[400px]">
-            {ACTIVE_TREKKERS.map((t, i) => (
+            {filteredTrekkers.map((t, i) => (
               <div
                 key={t.id}
                 className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.06] transition-colors animate-fadeInUp"
@@ -226,9 +246,9 @@ export default function LiveDashboard() {
         </h3>
 
         <div className="space-y-2.5">
-          {ALERTS.map((a, i) => (
+          {alerts.map((a, i) => (
             <div
-              key={a.id}
+              key={a.id || i}
               className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.06] transition-colors animate-fadeInUp"
               style={{ animationDelay: `${0.35 + i * 0.06}s` }}
             >
@@ -242,7 +262,7 @@ export default function LiveDashboard() {
               <p className="flex-1 text-sm text-slate-300 leading-snug">{a.message}</p>
 
               {/* Time */}
-              <span className="text-[11px] text-slate-500 flex-shrink-0 whitespace-nowrap">{a.time}</span>
+              <span className="text-[11px] text-slate-500 flex-shrink-0 whitespace-nowrap">{a.time || 'Just now'}</span>
             </div>
           ))}
         </div>

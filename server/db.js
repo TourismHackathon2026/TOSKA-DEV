@@ -1,5 +1,5 @@
 import Database from 'better-sqlite3';
-import bcrypt from 'bcryptjs';
+
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import fs from 'fs';
@@ -20,14 +20,15 @@ function initDatabase() {
   db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
+      firebase_uid TEXT UNIQUE NOT NULL,
       name TEXT NOT NULL,
-      email TEXT UNIQUE NOT NULL,
-      password TEXT NOT NULL,
+      email TEXT NOT NULL,
       phone TEXT,
       emergency_contact TEXT,
       avatar TEXT DEFAULT 'default-avatar.png',
       role TEXT DEFAULT 'trekker',
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
     CREATE TABLE IF NOT EXISTS treks (
@@ -375,34 +376,9 @@ function seedDatabase() {
   insertWeathers();
   console.log('  ✅ 6 weather records seeded');
 
-  // ── Seed Demo Users ──
-  const insertUser = db.prepare(`
-    INSERT INTO users (name, email, password, role)
-    VALUES (@name, @email, @password, @role)
-  `);
-
-  const users = [
-    {
-      name: 'Admin User',
-      email: 'admin@trailguard.com',
-      password: bcrypt.hashSync('admin123', 10),
-      role: 'admin'
-    },
-    {
-      name: 'Demo Trekker',
-      email: 'trekker@trailguard.com',
-      password: bcrypt.hashSync('trek123', 10),
-      role: 'trekker'
-    }
-  ];
-
-  const insertUsers = db.transaction(() => {
-    for (const user of users) {
-      insertUser.run(user);
-    }
-  });
-  insertUsers();
-  console.log('  ✅ 2 demo users seeded');
+  // Users are now created via Firebase Auth
+  // Demo users can be created by signing up through the app
+  console.log('  ℹ️  Users are managed by Firebase Auth — sign up through the app');
 
   console.log('🌱 Database seeding complete!');
 }

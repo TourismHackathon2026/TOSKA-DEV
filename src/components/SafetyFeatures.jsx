@@ -61,8 +61,11 @@ export default function SafetyFeatures() {
     >
       {/* ── Header ── */}
       <div className="text-center mb-12 sm:mb-16 animate-fadeInUp">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass text-sm text-emerald-300 font-medium mb-5">
-          <ShieldCheck size={16} className="text-emerald-400" />
+        <div
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium mb-5"
+          style={{ background: '#1A1A1A', border: '1px solid #2A2A2A', color: '#8E8E9A' }}
+        >
+          <ShieldCheck size={16} style={{ color: '#8E8E9A' }} />
           Trek Safely
         </div>
         <h2
@@ -70,9 +73,9 @@ export default function SafetyFeatures() {
           style={{ fontFamily: 'var(--font-heading)' }}
         >
           Safety First,{' '}
-          <span className="gradient-text">Always</span>
+          <span style={{ color: '#5BB4FF' }}>Always</span>
         </h2>
-        <p className="text-slate-400 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+        <p className="text-base sm:text-lg max-w-2xl mx-auto leading-relaxed" style={{ color: '#8E8E9A' }}>
           Every feature is built to keep you safe in the most remote corners of the Himalayas.
         </p>
       </div>
@@ -85,15 +88,13 @@ export default function SafetyFeatures() {
             <article
               key={f.title}
               id={`safety-${f.title.toLowerCase().replace(/[\s&]+/g, '-')}`}
-              className="glass-card p-6 relative overflow-hidden group animate-fadeInUp"
-              style={{ animationDelay: `${i * 0.1}s` }}
+              className="p-6 relative overflow-hidden group rounded-xl animate-fadeInUp"
+              style={{
+                background: '#1A1A1A',
+                border: '1px solid #2A2A2A',
+                animationDelay: `${i * 0.1}s`,
+              }}
             >
-              {/* Hover glow */}
-              <div
-                className="absolute -top-16 -right-16 w-40 h-40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                style={{ background: `radial-gradient(circle, ${f.glow}, transparent 70%)` }}
-              />
-
               {/* Icon circle */}
               <div
                 className={`relative w-14 h-14 rounded-2xl flex items-center justify-center mb-5 bg-gradient-to-br ${f.gradient} shadow-lg`}
@@ -108,7 +109,7 @@ export default function SafetyFeatures() {
               </h3>
 
               {/* Description */}
-              <p className="text-slate-400 text-sm leading-relaxed">
+              <p className="text-sm leading-relaxed" style={{ color: '#8E8E9A' }}>
                 {f.description}
               </p>
             </article>
